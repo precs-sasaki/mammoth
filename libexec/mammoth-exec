@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+#
+# Summary: Run an executable with the selected PHP version
+#
+# Usage: mammoth exec <command> [arg1 arg2...]
+#
+# Runs an executable by first preparing PATH so that the selected PHP
+# version's `bin' directory is at the front.
+#
+# For example, if the currently selected PHP version is 1.9.3-p327:
+#   mammoth exec bundle install
+#
+# is equivalent to:
+#   PATH="$MAMMOTH_ROOT/versions/1.9.3-p327/bin:$PATH" bundle install
+
+set -e
+[ -n "$MAMMOTH_DEBUG" ] && set -x
+
+# Provide mammoth completions
+if [ "$1" = "--complete" ]; then
+  exec mammoth shims --short
+fi
+
+export MAMMOTH_VERSION="$(mammoth-version-name)"
+MAMMOTH_COMMAND="$1"
+
+if [ -z "$MAMMOTH_COMMAND" ]; then
+  mammoth-help --usage exec >&2
+  exit 1
+fi
+
+MAMMOTH_COMMAND_PATH="$(mammoth-which "$MAMMOTH_COMMAND")"
+MAMMOTH_BIN_PATH="${MAMMOTH_COMMAND_PATH%/*}"
+
+for script in $(mammoth-hooks exec); do
+  source "$script"
+done
+
+shift 1
+if [ "$MAMMOTH_VERSION" != "system" ]; then
+  export PATH="${MAMMOTH_BIN_PATH}:${PATH}"
+fi
+exec -a "$MAMMOTH_COMMAND" "$MAMMOTH_COMMAND_PATH" "$@"

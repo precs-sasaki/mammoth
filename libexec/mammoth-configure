@@ -2,7 +2,7 @@
 # Summary: Edit the current PHP's php.ini configuration file at location
 
 set -e
-[ -n "$PHPENV_DEBUG" ] && set -x
+[ -n "$MAMMOTH_DEBUG" ] && set -x
 
 if [ "$VISUAL" ]; then
 	cmd="$VISUAL"

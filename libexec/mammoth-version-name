@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Summary: Show the current PHP version
+set -e
+[ -n "$MAMMOTH_DEBUG" ] && set -x
+
+if [ -z "$MAMMOTH_VERSION" ]; then
+  MAMMOTH_VERSION_FILE="$(mammoth-version-file)"
+  MAMMOTH_VERSION="$(mammoth-version-file-read "$MAMMOTH_VERSION_FILE" || true)"
+fi
+
+if [ -z "$MAMMOTH_VERSION" ] || [ "$MAMMOTH_VERSION" = "system" ]; then
+  echo "system"
+  exit
+fi
+
+version_exists() {
+  local version="$1"
+  [ -d "${MAMMOTH_ROOT}/versions/${version}" ]
+}
+
+if version_exists "$MAMMOTH_VERSION"; then
+  echo "$MAMMOTH_VERSION"
+elif version_exists "${MAMMOTH_VERSION#php-}"; then
+  { echo "warning: ignoring extraneous \`php-' prefix in version \`${MAMMOTH_VERSION}'"
+    echo "         (set by $(mammoth-version-origin))"
+  } >&2
+  echo "${MAMMOTH_VERSION#php-}"
+else
+  echo "mammoth: version \`$MAMMOTH_VERSION' is not installed" >&2
+  exit 1
+fi

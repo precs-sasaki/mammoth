@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# Summary: Display prefix for a PHP version
+# Usage: mammoth prefix [<version>]
+#
+# Displays the directory where a PHP version is installed. If no
+# version is given, `mammoth prefix' displays the location of the
+# currently selected version.
+
+set -e
+[ -n "$MAMMOTH_DEBUG" ] && set -x
+
+# Provide mammoth completions
+if [ "$1" = "--complete" ]; then
+  echo system
+  exec mammoth-versions --bare
+fi
+
+if [ -n "$1" ]; then
+  export MAMMOTH_VERSION="$1"
+elif [ -z "$MAMMOTH_VERSION" ]; then
+  MAMMOTH_VERSION="$(mammoth-version-name)"
+fi
+
+if [ "$MAMMOTH_VERSION" = "system" ]; then
+  PHP_PATH="$(mammoth-which php)"
+  PHP_PATH="${PHP_PATH%/*}"
+  echo "${PHP_PATH%/bin}"
+  exit
+fi
+
+MAMMOTH_PREFIX_PATH="${MAMMOTH_ROOT}/versions/${MAMMOTH_VERSION}"
+if [ ! -d "$MAMMOTH_PREFIX_PATH" ]; then
+  echo "mammoth: version \`${MAMMOTH_VERSION}' not installed" >&2
+  exit 1
+fi
+
+echo "$MAMMOTH_PREFIX_PATH"

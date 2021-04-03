@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Summary: Configure the shell environment for phpenv
-# Usage: eval "$(phpenv init - [--no-rehash] [<shell>])"
+# Summary: Configure the shell environment for mammoth
+# Usage: eval "$(mammoth init - [--no-rehash] [<shell>])"
 
 set -e
-[ -n "$PHPENV_DEBUG" ] && set -x
+[ -n "$MAMMOTH_DEBUG" ] && set -x
 
 print=""
 no_rehash=""
@@ -64,15 +64,15 @@ if [ -z "$print" ]; then
     ;;
   esac
 
-  { echo "# Load phpenv automatically by adding"
+  { echo "# Load mammoth automatically by adding"
     echo "# the following to ${profile}:"
     echo
     case "$shell" in
     fish )
-      echo 'status --is-interactive; and source (phpenv init -|psub)'
+      echo 'status --is-interactive; and source (mammoth init -|psub)'
       ;;
     * )
-      echo 'eval "$(phpenv init -)"'
+      echo 'eval "$(mammoth init -)"'
       ;;
     esac
     echo
@@ -81,52 +81,52 @@ if [ -z "$print" ]; then
   exit 1
 fi
 
-mkdir -p "${PHPENV_ROOT}/"{shims,versions}
+mkdir -p "${MAMMOTH_ROOT}/"{shims,versions}
 
 case "$shell" in
 fish )
-  echo "set -gx PATH '${PHPENV_ROOT}/shims' \$PATH"
+  echo "set -gx PATH '${MAMMOTH_ROOT}/shims' \$PATH"
   ;;
 * )
-  echo 'export PATH="'${PHPENV_ROOT}'/shims:${PATH}"'
+  echo 'export PATH="'${MAMMOTH_ROOT}'/shims:${PATH}"'
   ;;
 esac
 
 case "$shell" in
 bash | zsh | fish )
-  echo "source \"$root/completions/phpenv.${shell}\""
+  echo "source \"$root/completions/mammoth.${shell}\""
   ;;
 esac
 
 if [ -z "$no_rehash" ]; then
-  echo 'phpenv rehash 2>/dev/null'
+  echo 'mammoth rehash 2>/dev/null'
 fi
 
-commands=(`phpenv-commands --sh`)
+commands=(`mammoth-commands --sh`)
 case "$shell" in
 fish )
   cat <<EOS
-function phpenv
+function mammoth
   set command \$argv[1]
   set -e argv[1]
   switch "\$command"
   case ${commands[*]}
-    source (phpenv "sh-\$command" \$argv|psub)
+    source (mammoth "sh-\$command" \$argv|psub)
   case '*'
-    command phpenv "\$command" \$argv
+    command mammoth "\$command" \$argv
   end
 end
 EOS
   ;;
 ksh )
   cat <<EOS
-function phpenv {
+function mammoth {
   typeset command
 EOS
   ;;
 * )
   cat <<EOS
-phpenv() {
+mammoth() {
   local command
 EOS
   ;;
@@ -142,9 +142,9 @@ cat <<EOS
 
   case "\$command" in
   ${commands[*]})
-    eval \`phpenv "sh-\$command" "\$@"\`;;
+    eval \`mammoth "sh-\$command" "\$@"\`;;
   *)
-    command phpenv "\$command" "\$@";;
+    command mammoth "\$command" "\$@";;
   esac
 }
 EOS

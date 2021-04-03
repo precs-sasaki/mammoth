@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+#
+# Summary: Display the full path to an executable
+#
+# Usage: mammoth which <command>
+#
+# Displays the full path to the executable that mammoth will invoke when
+# you run the given command.
+
+set -e
+[ -n "$MAMMOTH_DEBUG" ] && set -x
+
+# Provide mammoth completions
+if [ "$1" = "--complete" ]; then
+  exec mammoth shims --short
+fi
+
+expand_path() {
+  if [ ! -d "$1" ]; then
+    return 1
+  fi
+
+  local cwd="$(pwd)"
+  cd "$1"
+  pwd
+  cd "$cwd"
+}
+
+remove_from_path() {
+  local path_to_remove="$(expand_path "$1")"
+  local result=""
+
+  if [ -z "$path_to_remove" ]; then
+    echo "${PATH}"
+    return
+  fi
+
+  local paths
+  IFS=: paths=($PATH)
+
+  for path in "${paths[@]}"; do
+    path="$(expand_path "$path" || true)"
+    if [ -n "$path" ] && [ "$path" != "$path_to_remove" ]; then
+      result="${result}${path}:"
+    fi
+  done
+
+  echo "${result%:}"
+}
+
+MAMMOTH_VERSION="$(mammoth-version-name)"
+MAMMOTH_COMMAND="$1"
+
+if [ -z "$MAMMOTH_COMMAND" ]; then
+  mammoth-help --usage which >&2
+  exit 1
+fi
+
+if [ "$MAMMOTH_VERSION" = "system" ]; then
+  PATH="$(remove_from_path "${MAMMOTH_ROOT}/shims")"
+  MAMMOTH_COMMAND_PATH="$(command -v "$MAMMOTH_COMMAND" || true)"
+else
+  MAMMOTH_COMMAND_PATH="${MAMMOTH_ROOT}/versions/${MAMMOTH_VERSION}/bin/${MAMMOTH_COMMAND}"
+  if ! [ -x "$MAMMOTH_COMMAND_PATH" ]; then
+    MAMMOTH_COMMAND_PATH="${MAMMOTH_ROOT}/versions/${MAMMOTH_VERSION}/sbin/${MAMMOTH_COMMAND}"
+  fi
+fi
+
+for script in $(mammoth-hooks which); do
+  source "$script"
+done
+
+if [ -x "$MAMMOTH_COMMAND_PATH" ]; then
+  echo "$MAMMOTH_COMMAND_PATH"
+else
+  echo "mammoth: $MAMMOTH_COMMAND: command not found" >&2
+
+  versions="$(mammoth-whence "$MAMMOTH_COMMAND" || true)"
+  if [ -n "$versions" ]; then
+    { echo
+      echo "The \`$1' command exists in these PHP versions:"
+      echo "$versions" | sed 's/^/  /g'
+      echo
+    } >&2
+  fi
+
+  exit 127
+fi

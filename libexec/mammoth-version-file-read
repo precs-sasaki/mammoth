@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Usage: phpenv version-file-read <file>
+# Usage: mammoth version-file-read <file>
 set -e
-[ -n "$PHPENV_DEBUG" ] && set -x
+[ -n "$MAMMOTH_DEBUG" ] && set -x
 
 VERSION_FILE="$1"
 

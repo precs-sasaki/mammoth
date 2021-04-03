@@ -2,10 +2,10 @@
 # Summary: Show the current PHP version and its origin
 #
 # Shows the currently selected PHP version and how it was
-# selected. To obtain only the version string, use `phpenv
+# selected. To obtain only the version string, use `mammoth
 # version-name'.
 
 set -e
-[ -n "$PHPENV_DEBUG" ] && set -x
+[ -n "$MAMMOTH_DEBUG" ] && set -x
 
-echo "$(phpenv-version-name) (set by $(phpenv-version-origin))"
+echo "$(mammoth-version-name) (set by $(mammoth-version-origin))"

@@ -3,11 +3,11 @@ set -e
 export -n CDPATH
 
 if [ "$1" = "--debug" ]; then
-  export PHPENV_DEBUG=1
+  export MAMMOTH_DEBUG=1
   shift
 fi
 
-if [ -n "$PHPENV_DEBUG" ]; then
+if [ -n "$MAMMOTH_DEBUG" ]; then
   export PS4='+ [${BASH_SOURCE##*/}:${LINENO}] '
   set -x
 fi
@@ -30,59 +30,59 @@ abs_dirname() {
   cd "$cwd"
 }
 
-if [ -z "${PHPENV_ROOT}" ]; then
-  PHPENV_ROOT="${HOME}/.phpenv"
+if [ -z "${MAMMOTH_ROOT}" ]; then
+  MAMMOTH_ROOT="${HOME}/.mammoth"
 else
-  PHPENV_ROOT="${PHPENV_ROOT%/}"
+  MAMMOTH_ROOT="${MAMMOTH_ROOT%/}"
 fi
-export PHPENV_ROOT
+export MAMMOTH_ROOT
 
-if [ -z "${PHPENV_DIR}" ]; then
-  PHPENV_DIR="$(pwd)"
+if [ -z "${MAMMOTH_DIR}" ]; then
+  MAMMOTH_DIR="$(pwd)"
 else
-  cd "$PHPENV_DIR" 2>/dev/null || {
-    echo "phpenv: cannot change working directory to \`$PHPENV_DIR'"
+  cd "$MAMMOTH_DIR" 2>/dev/null || {
+    echo "mammoth: cannot change working directory to \`$MAMMOTH_DIR'"
     exit 1
   } >&2
-  PHPENV_DIR="$(pwd)"
+  MAMMOTH_DIR="$(pwd)"
   cd "$OLDPWD"
 fi
-export PHPENV_DIR
+export MAMMOTH_DIR
 
 
 shopt -s nullglob
 
 bin_path="$(abs_dirname "$0")"
-for plugin_bin in "${PHPENV_ROOT}/plugins/"*/bin; do
+for plugin_bin in "${MAMMOTH_ROOT}/plugins/"*/bin; do
   bin_path="${bin_path}:${plugin_bin}"
 done
 export PATH="${bin_path}:${PATH}"
 
-hook_path="${PHPENV_HOOK_PATH}:${PHPENV_ROOT}/phpenv.d:/usr/local/etc/phpenv.d:/etc/phpenv.d:/usr/lib/phpenv/hooks"
-for plugin_hook in "${PHPENV_ROOT}/plugins/"*/etc/phpenv.d; do
+hook_path="${MAMMOTH_HOOK_PATH}:${MAMMOTH_ROOT}/mammoth.d:/usr/local/etc/mammoth.d:/etc/mammoth.d:/usr/lib/mammoth/hooks"
+for plugin_hook in "${MAMMOTH_ROOT}/plugins/"*/etc/mammoth.d; do
   hook_path="${hook_path}:${plugin_hook}"
 done
-export PHPENV_HOOK_PATH="$hook_path"
+export MAMMOTH_HOOK_PATH="$hook_path"
 
 shopt -u nullglob
 
 command="$1"
 if [[ "$2" = "--help"  || "$2" = "-h"  ]]; then
-  phpenv-help "$command" >&2
+  mammoth-help "$command" >&2
   exit 1
 fi
 
 case "$command" in
 "" | "-h" | "--help" )
-  echo -e "$(phpenv-help)" >&2
+  echo -e "$(mammoth-help)" >&2
   ;;
 "-v" )
-  exec phpenv---version
+  exec mammoth---version
   ;;
 * )
-  command_path="$(command -v "phpenv-$command" || true)"
+  command_path="$(command -v "mammoth-$command" || true)"
   if [ -z "$command_path" ]; then
-    echo "phpenv: no such command \`$command'" >&2
+    echo "mammoth: no such command \`$command'" >&2
     exit 1
   fi
 

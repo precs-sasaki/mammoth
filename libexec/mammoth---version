@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Summary: Display the version of phpenv
+# Summary: Display the version of mammoth
 #
-# Displays the version number of this phpenv release, including the
+# Displays the version number of this mammoth release, including the
 # current revision from git, if available.
 #
 # The format of the git revision is:
@@ -10,13 +10,13 @@
 # tagged.
 
 set -e
-[ -n "$PHPENV_DEBUG" ] && set -x
+[ -n "$MAMMOTH_DEBUG" ] && set -x
 
 version="0.9.0-rc.1"
 git_revision=""
 
-cd "$PHPENV_ROOT"
+cd "$MAMMOTH_ROOT"
 git_revision="$(git describe --tags HEAD 2>/dev/null || true)"
 git_revision="${git_revision#v}"
 
-echo "phpenv v${git_revision:-$version}"
+echo "mammoth v${git_revision:-$version}"

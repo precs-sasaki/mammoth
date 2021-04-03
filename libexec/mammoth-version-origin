@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+# Summary: Explain how the current PHP version is set
+set -e
+[ -n "$MAMMOTH_DEBUG" ] && set -x
+
+if [ -n "$MAMMOTH_VERSION" ]; then
+  echo "MAMMOTH_VERSION environment variable"
+else
+  mammoth-version-file
+fi
