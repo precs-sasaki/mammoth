@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Usage: mammoth version-file-write <file> <version>
+
+set -e
+[ -n "$MAMMOTH_DEBUG" ] && set -x
+
+MAMMOTH_VERSION_FILE="$1"
+MAMMOTH_VERSION="$2"
+
+if [ -z "$MAMMOTH_VERSION" ] || [ -z "$MAMMOTH_VERSION_FILE" ]; then
+  mammoth-help --usage version-file-write >&2
+  exit 1
+fi
+
+# Make sure the specified version is installed.
+mammoth-prefix "$MAMMOTH_VERSION" >/dev/null
+
+# Write the version out to disk.
+echo "$MAMMOTH_VERSION" > "$MAMMOTH_VERSION_FILE"

@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Summary: List hook scripts for a given phpenv command
-# Usage: phpenv hooks <command>
+# Summary: List hook scripts for a given mammoth command
+# Usage: mammoth hooks <command>
 
 set -e
-[ -n "$PHPENV_DEBUG" ] && set -x
+[ -n "$MAMMOTH_DEBUG" ] && set -x
 
-# Provide phpenv completions
+# Provide mammoth completions
 if [ "$1" = "--complete" ]; then
   echo exec
   echo rehash
@@ -13,15 +13,15 @@ if [ "$1" = "--complete" ]; then
   exit
 fi
 
-PHPENV_COMMAND="$1"
-if [ -z "$PHPENV_COMMAND" ]; then
-  phpenv-help --usage hooks >&2
+MAMMOTH_COMMAND="$1"
+if [ -z "$MAMMOTH_COMMAND" ]; then
+  mammoth-help --usage hooks >&2
   exit 1
 fi
 
-#PHPENV_COMMAND_HOOK="$2"
-#if [ -z "$PHPENV_COMMAND_HOOK" ]; then
-#  PHPENV_COMMAND_HOOK="*"
+#MAMMOTH_COMMAND_HOOK="$2"
+#if [ -z "$MAMMOTH_COMMAND_HOOK" ]; then
+#  MAMMOTH_COMMAND_HOOK="*"
 #fi
 
 resolve_link() {
@@ -44,16 +44,16 @@ realpath() {
 }
 
 shopt -s nullglob
-for path in ${PHPENV_HOOK_PATH//:/$'\n'}; do
-  for script in $path/"$PHPENV_COMMAND"/*.bash; do
+for path in ${MAMMOTH_HOOK_PATH//:/$'\n'}; do
+  for script in $path/"$MAMMOTH_COMMAND"/*.bash; do
     echo $(realpath $script)
   done
 done
 #
-#for path in ${PHPENV_HOOK_PATH//:/$'\n'}; do
-#  files="${path}/${PHPENV_COMMAND}/${PHPENV_COMMAND_HOOK}.bash"
+#for path in ${MAMMOTH_HOOK_PATH//:/$'\n'}; do
+#  files="${path}/${MAMMOTH_COMMAND}/${MAMMOTH_COMMAND_HOOK}.bash"
 #  for script in $files; do
-#    if [ "$PHPENV_COMMAND_HOOK" != "*" ] && [ -x $script ]; then
+#    if [ "$MAMMOTH_COMMAND_HOOK" != "*" ] && [ -x $script ]; then
 #      exec "$script"
 #    elif [ -f $script ]; then
 #      echo $(realpath $script)
